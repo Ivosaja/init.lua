@@ -67,5 +67,8 @@ return {
 			}),
 			matching = { disallow_symbol_nonprefix_matching = false },
 		})
+		nomap = function()
+			local keymaps = {}
+		end
 	end,
 }
