@@ -26,6 +26,10 @@ return {
 				"clangd",
 				"gopls",
 				"ts_ls",
+				"html",
+				"cssls",
+				"jsonls",
+				"angularls",
 			},
 			handlers = {
 				function(server_name) -- whatever server you want
@@ -41,6 +45,26 @@ return {
 								},
 							},
 						},
+					})
+				end,
+				["html"] = function()
+					lspconfig.html.setup({
+						capabilities = capabilities,
+						filetypes = { "html" }, -- no htmlangular
+					})
+				end,
+				["angularls"] = function()
+					lspconfig.angularls.setup({
+						capabilities = capabilities,
+						cmd = {
+							"ngserver",
+							"--stdio",
+							"--tsProbeLocations",
+							"",
+							"--ngProbeLocations",
+							"",
+						},
+						filetypes = { "html", "htmlangular", "typescript" },
 					})
 				end,
 			},
@@ -67,5 +91,19 @@ return {
 			}),
 			matching = { disallow_symbol_nonprefix_matching = false },
 		})
+		vim.api.nvim_create_autocmd("LspAttach", {
+			callback = function(e)
+				local opts = { buffer = e.buf }
+				vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+				vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+				vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+				vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+				vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+			end,
+		})
 	end,
+	vim.diagnostic.config({
+		signs = false,
+		underline = true,
+	}),
 }
